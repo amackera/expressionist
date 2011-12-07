@@ -1,9 +1,12 @@
-// Discussion Canvas jQuery plugin
+//    _____  _____  ___  ____________________  _  __ ______________
+//   / __/ |/_/ _ \/ _ \/ __/ __/ __/  _/ __ \/ |/ //  _/ __/_  __/
+//  / _/_>  </ ___/ , _/ _/_\ \_\ \_/ // /_/ /    /_/ /_\ \  / /   
+// /___/_/|_/_/  /_/|_/___/___/___/___/\____/_/|_//___/___/ /_/    
+//
+// Expressionist jQuery plugin
 //
 // Author: Anson MacKeracher
 // Date: June 21, 2001
-//
-// Layer between Raphael and the Discussion module's canvas
 
 (function($) {
     var methods = {
@@ -36,6 +39,7 @@
                 html += "<a id='canvas_size_medium' href='#'><img src='" + options.image_path + "pen.png' style='width:15px;'/></a>";
                 html += "<a id='canvas_size_large' href='#'><img src='" + options.image_path + "pen.png' style='width:20px'/></a>";
                 html += "<a id='canvas_clear' style='float:right; margin-top:10px;' href='#'>Clear canvas</a>";
+                html += "</div>";
                 var html_el = $(html)
 
                 // Initialize the control logic
@@ -119,11 +123,13 @@
 
                 // Bind mouse events on the canvas element
                 canvas_el.mousedown(function(ev) {
+                    ev.preventDefault();
                     c = get_canvas_coords(ev);
                     start_painting(c.x, c.y);
                 });
 
                 canvas_el.mousemove(function(ev) {
+                    ev.preventDefault();
                     if (state.paint) {
                         c = get_canvas_coords(ev);
                         add_click(c.x, c.y)
@@ -131,11 +137,13 @@
                 });
 
                 canvas_el.mouseup(function(ev) {
+                    ev.preventDefault();
                     c = get_canvas_coords(ev);
                     stop_painting(c.x, c.y);
                 });
 
                 canvas_el.mouseleave(function(ev) {
+                    ev.preventDefault();
                     c = get_canvas_coords(ev)
                     stop_painting(c.x, c.y);
                 });
@@ -152,6 +160,13 @@
         },
         "clear": function() {
             canvas_params.context.clearRect(0, 0, canvas_params.width, canvas_params.height);
+        },
+        "background_image": function(background_image) {
+            settings.background_image = new Image();
+            settings.background_image.src = background_image;
+            settings.background_image.onload = function() {
+                canvas_params.context.drawImage(settings.background_image, 0, 0, canvas_params.width, canvas_params.height);
+            };
         }
     };
 
@@ -206,7 +221,8 @@
 
     var settings = {
         hidden: false,
-        image_path: "../../images/edumacation/discussion/"
+        image_path: "../../images/edumacation/discussion/",
+        background_image: undefined
     };
 
     var canvas_params = {
@@ -226,13 +242,13 @@
         started: false
     };
 
-    $.fn.disc_canvas = function(method) {
+    $.fn.expressionist = function(method) {
         if (methods[method]) {
             return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
         } else if (typeof method === "object" || ! method) {
             return methods.init.apply(this, arguments);
         } else {
-            $.error("Method " + method + " does not exist on jQuery.disc_method!");
+            $.error("Method " + method + " does not exist on jQuery.expressionist!");
         }
     };
 })(jQuery);
